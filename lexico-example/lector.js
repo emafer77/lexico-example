@@ -20,8 +20,8 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
        
        var query = cadena_split[i].split(" ");}
 
-       const operadoresLogicos = ["&&", "||", "!", "AND", "OR", "NOT"];
-       const operadoresComparacion = [">", "<", "==",">=", "<=", "!="];
+       const operadoresLogicos = [  "AND", "OR", "NOT"];
+       const operadoresComparacion = [">", "<", "=",">=", "<=", "!="];
        const renglonesIncorrectos = [];
 
 
