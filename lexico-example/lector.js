@@ -15,12 +15,6 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
     console.log("nombres de las columnas",cadena_split );
 
 
-   for (let i = 0; i < cadena_split.length; i++) {
-
-       
-       var query = cadena_split[i].split(" ");}
-
-   
        const renglonesIncorrectos = [];
 
 
