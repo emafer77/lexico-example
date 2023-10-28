@@ -1,3 +1,4 @@
+const { Console } = require('console');
 const fs = require('fs');
 
 fs.readFile('database.txt', 'utf8', (err, data) => {
@@ -7,7 +8,6 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
     }
 
     //ARREGLOS POR POCISION
-   
   
 
      var cadena_split = data.split('\n').map(linea => linea.replace('\r',''));
@@ -16,6 +16,7 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
 
 
        const renglonesIncorrectos = [];
+       const queryObtenido =[]; //en este arreglo se guardara el query obtenido
 
 
        for (let i = 0; i < cadena_split.length; i++) {
@@ -24,100 +25,291 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         const operadoresLogicos = ["AND", "OR", "NOT"];
         const operadoresComparacion = [">", "<", "=", ">=", "<=", "!="];
 
-        if (query.length!=19 || query.length == 0) {
-            console.log("el tamaño de query es incorrecto en el renglón " + i);
-            // Agregar el renglón incorrecto al array
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
+          /////////VALIDACIONES/////////  
+    const buscarCierre =queryObtenido.indexOf(6);//con esto busco  ";" del query
+    const querytamañofinal= [];
+    for(let i=0; i <= buscarCierre-1;i++){
+        querytamañofinal.push(queryObtenido[i]);
+    }
+    /////////////////////////////////////////////////////////////////
+        ///////// TOKENIZAR /////////
+
+
+        ///////////tokenizar la posicion 0/////////////
+        if (query[0] === 'SELECT') {
+           queryObtenido.push(655);
+            
+        } else{
+            queryObtenido.push('error');
         }
+       //////////////////////////////////////////////////
+
+       ////////////tokenizar la posicion 1///////////////////
+         if (query[1] === '*') {
+            queryObtenido.push(7);
+           console.log(queryObtenido);
+        } 
+         else if ( typeof query[1] === 'string') {
+          const arregloQuery1= query[1].split(',');// aqui se obtendra otro arreglo para haci hacer las validaciones
+          //aqui valido que el string  no empieze ni termine en una ´,´
+
+            if (arregloQuery1[0] === "" || arregloQuery1[arregloQuery1.length - 1] === "") {
+            console.log("dato incorrecto en la posicion [1]");
+          } else{
+            queryObtenido.push(1000)}
+        }  
+       //////////////////////////////////////////////////////////// 
+       
+       ///////////////tokenizar la posicion 2/////////////////////7
+
+        
+       if (query[2] === 'FROM') {
+          queryObtenido.push(309)
+          
+        }  else{
+            queryObtenido.push('error');
+        }
+          ////////////////////////
+          
+        /////tokenizar la posicion 3/////////
+        
+        
+        if (typeof query[3] === 'string') {
+          queryObtenido.push(1000);
+        }
+         ///////////////////////
+      
+        //////////tokenizar la posicion 4///////
+         if ( query[4] === 'WHERE') {
+          queryObtenido.push(800);
+        } else if(query[4]===';'){
+        queryObtenido.push(6);
+
+      } else{
+        queryObtenido.push('error');
+    }
+        ///////////////////////////////////////
+
+      ///////tokenizar la posicion 5///////
+
+      if (typeof query[5] === 'string') {
+        queryObtenido.push(1000);
+      }
 
 
-        //  VALIDACION DE DATOS CORRECTOS
-        if (query[0] !== 'SELECT') {
-            console.error('Error: Se esperaba "SELECT" en la posición[0] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if (query[1] !== '*' && typeof query[1] !== 'string') {
-            console.error('Error: Se esperaba un * o el nombre de una columna en la posicion[1] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if (query[2] !== 'FROM') {
-            console.error('Error: Se esperaba "FROM" en la tercera posición[2] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if (typeof query[3] !== 'string') {
-            console.error('Error: Se esperaba el nombre de una tabla en la posición[3] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-            //WHERE//////////////////////
-        } else if (query[4] !== 'WHERE') {
-            console.error('Error: Se esperaba "WHERE" en la quinta posición[4] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if (typeof query[5] !== 'string') {
-            console.error('Error: Se esperaba el nombre de una columna en la  posición[5] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if (!operadoresComparacion.includes(query[6])) {
-            console.error('Error: Se esperaba un operador de comparación válido en la posición[6] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if(isNaN(parseInt(query[7]))){
-            console.log('Error: Se esperaba un numero en la pocision[7] ');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        }else if (!operadoresLogicos.includes(query[8])) {
-            console.error('Error: Se esperaba un operador logico válido en la posición[8] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        }else if (typeof query[9] !== 'string') {
-            console.error('Error: Se esperaba el nombre de columna en la posición[9] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        }else if (!operadoresComparacion.includes(query[10])) {
-            console.error('Error: Se esperaba un operador de comparación válido en la posición[10] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        }else if (query[11] !== "'ensenada'") {
-            console.error('Error: Se esperaba "ensenada" en la quinta posición[11] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
+      ////////////////////////////////////
+
+    ////tokenizar la posicion 6//////////////////
+        if (operadoresComparacion.includes(query[6])) {
+            if(query[6]=== ">"){
+               queryObtenido.push(14) ;
+            }else if(query[6]=== "<"){
+                queryObtenido.push(13) ;
+            }
+            else if(query[6]=== "="){
+            queryObtenido.push(10) ;
+            }
+            else if(query[6]=== ">="){
+            queryObtenido.push(30) ;
+            }
+            else if(query[6]=== "<="){
+            queryObtenido.push(31) ;
+            }
+            else if(query[6]=== "!="){
+                queryObtenido.push(32) ;
+                }
+
+        }  else{
+            queryObtenido.push('error');
+        }
+        /////////////////////////////////////
+      
+        //////tokenizar posicion 7//////////////////
+        
+        if(!isNaN(parseInt(query[7]))){
+            queryObtenido.push(2000);
+           ;} else{
+            queryObtenido.push('error');
+        }
+  
+
+            
+        ///////////////////////////////////////////
+        /////////////tokenizar posicion 8///////////////////
+
+        if(query[8]===";"){
+            queryObtenido.push(6)
+
+        }
+        else if (operadoresLogicos.includes(query[8])) {
+           
+            if(query[8]=== "AND"){
+               queryObtenido.push(115) ;
+            }else if(query[8]=== "OR"){
+                queryObtenido.push(527) ;
+            }
+            else if(query[8]=== "NOT"){
+            queryObtenido.push(502) ;
+            }
+            
+         }   
+         else{
+            queryObtenido.push('error');
+        }
+        ///////////////////////////////////////////////////
+
+        ///////////toquenizar posicion 9///////////////
+        if (typeof query[9] === 'string') {
+            queryObtenido.push(1000);
+        } 
+        ////////////////////////////////////////////
+
+        //////////tokenizar posicion 10///////////////////
+        
+        if (operadoresComparacion.includes(query[10])) {
+            if(query[10]=== ">"){
+                queryObtenido.push(14) ;
+             }else if(query[10]=== "<"){
+                 queryObtenido.push(13) ;
+             }
+             else if(query[10]=== "="){
+             queryObtenido.push(10) ;
+             }
+             else if(query[10]=== ">="){
+             queryObtenido.push(30) ;
+             }
+             else if(query[10]=== "<="){
+             queryObtenido.push(31) ;
+             }
+             else if(query[10]=== "!="){
+                 queryObtenido.push(32) ;
+                 }
+           }  else{
+            queryObtenido.push('error');
+        }
+         
+        ////////////////////////////////////////////////////////
+
+        ///////////vtokenizar posicion11////////////////////////////
+        if (typeof query[11] === 'string') {
+            const arregloQuery2= query[11].split("'");// aqui se obtendra otro arreglo para haci hacer las validaciones
+            //aqui valido que el string  empieze con ' y termine con '
+              if (arregloQuery2[0] === "" && arregloQuery2[arregloQuery2.length - 1] === "") {
+              queryObtenido.push(1001)}
+              else{
+                queryObtenido.push('error');
+            }
+            }
+                    
         //////////////////////////////////////////////
-        }else if (query[12] !== 'ORDER') {
-            console.error('Error: Se esperaba "ORDER " en la posición[12] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if(query[13] !== 'BY'){
-            console.error('Error: Se esperaba "BY" en la  posición[13] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
+
+        /////////////tokenizar la posicion 12///////////////
+        if(query[12]===";"){    
+            queryObtenido.push(6);
         }
-        else if (typeof query[14] !== 'string') {
-            console.error('Error: Se esperaba el nombre de una columna en la posición[14] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if (query[15] !== 'ASC' && query[15] !== 'DESC') {
-            console.error('Error: Se esperaba "ASC" o "DESC" en la posición[15] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if (query[16] !== 'LIMIT') {
-            console.error('Errosr: Se esperaba "LIMIT" en la  posición[16] del query.');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if (isNaN(parseInt(query[17]))) {
-            console.error('Error: Se esperaba un número en la posicion[17]del query');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
-        } else if( query[18] !== ';'){
-            console.error('Error: Se esperaba un ";" en la posicion[18]del query');
-            renglonesIncorrectos.push("Renglon " + i + " : " + cadena_split[i]);
-            continue;
+        else if (query[12] === 'ORDER') {
+           queryObtenido.push(528);
+        }  
+        else{
+            queryObtenido.push('error');
         }
-        else {
-            console.log('El query es válido.');
+        
+        /////////////////////////////////////////////////////////
+
+        //////////// tokenizar la posicion 13/////////////////////
+        if(query[13] === 'BY'){
+           queryObtenido.push(79);
         }
+        else{
+            queryObtenido.push('error');
+        }
+        ///////////////////////////////////////////////////////////////////
+
+        /////////tokenizar la posicion 14/////////////////////////////
+         if (typeof query[14] === 'string') {
+            queryObtenido.push(1000);
+        }
+        
+        /////////////////////////////////////////////////////////////
+        
+        /////////////////tokenizar la posicion 15//////////////////////////
+         if (query[15] === 'ASC' ) {
+           queryObtenido.push(119)
+        } 
+        else if(query[15] === 'DESC'){
+            queryObtenido.push(231)
+        }
+        else{
+            queryObtenido.push('error');
+        }
+        /////////////////////////////////////////////////////////////////////
+        
+        ////////////tokenizar posicion 16////////////////////////////
+        if(query[16]===";"){
+            queryObtenido.push(6);
+
+        }
+        else if (query[16] === 'LIMIT') {
+           queryObtenido.push(407);
+        }  
+        else{
+            queryObtenido.push('error');
+        }
+        ////////////////////////////////////////////////////
+
+        //////////////////tokenizar posicion 17//////////////////
+        if (!isNaN(parseInt(query[17]))) {
+            queryObtenido.push(2000);
+        }
+        else{
+            queryObtenido.push('error');
+        }
+        //////////////////////////////////////////////////////////////////////
+
+        ///////////////tokenizar posicion 18///////////////////////////////
+        if( query[18] === ';'){
+           queryObtenido.push(6);
+        }
+        else{
+            queryObtenido.push('error');
+        }
+        /////////////////////////////////
+        console.log("tokenizar elementos del arreglo: ", queryObtenido);
+
+       
+    
+    }  /////////VALIDACIONES/////////  
+    const buscarCierre =queryObtenido.indexOf(6);//con esto busco  ";" del query
+    const querytamañofinal= [];//en este query se guardara el arreglo final para hacer validaciones
+
+    for(let i=0; i <= buscarCierre;i++){
+        querytamañofinal.push(queryObtenido[i]);
     }
 
+//aqui se escriben  los querys que son validos
+const queryValido1 =[655,1000,309,1000,800,1000,10,2000,115,1000,10,1001,528,79,1000,231,407,2000,6];
+const queryValido2= [655,1000,309,1000,6];
+///////////////////////////////////////////////////////////////
+console.log("Este es el arreglo final: ", querytamañofinal);
+
+ if(querytamañofinal.join(" ") === queryValido1.join(" "))
+ {
+    console.log("el query es valido");
+ }else if(querytamañofinal.join(" ") === queryValido2.join(" ")){
+    console.log("el query es valido");
+ }
+ else{
+    console.log("el query no es valido")
+ }
+
+
+    /////////////////////////////////////////////////////////////////
+
+ 
+    console.log(querytamañofinal);
+  
+
+/////////////////////////////////////
      // Crear y escribir en el archivo de registro
      const logData = renglonesIncorrectos.join('\n');
      fs.writeFile('log.txt', logData, (err) => {
