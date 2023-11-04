@@ -15,7 +15,7 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
     console.log("nombres de las columnas",cadena_split );
 
 
-       const renglonesIncorrectos = [];
+        const renglonesIncorrectos = [];
        const queryObtenido =[]; //en este arreglo se guardara el query obtenido
 
 
@@ -25,13 +25,7 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         const operadoresLogicos = ["AND", "OR", "NOT"];
         const operadoresComparacion = [">", "<", "=", ">=", "<=", "!="];
 
-          /////////VALIDACIONES/////////  
-    const buscarCierre =queryObtenido.indexOf(6);//con esto busco  ";" del query
-    const querytamañofinal= [];
-    for(let i=0; i <= buscarCierre-1;i++){
-        querytamañofinal.push(queryObtenido[i]);
-    }
-    /////////////////////////////////////////////////////////////////
+        
         ///////// TOKENIZAR /////////
 
 
@@ -45,19 +39,26 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
        //////////////////////////////////////////////////
 
        ////////////tokenizar la posicion 1///////////////////
-         if (query[1] === '*') {
+        if (query[1] === '*') {
             queryObtenido.push(7);
            console.log(queryObtenido);
         } 
-         else if ( typeof query[1] === 'string') {
-          const arregloQuery1= query[1].split(',');// aqui se obtendra otro arreglo para haci hacer las validaciones
-          //aqui valido que el string  no empieze ni termine en una ´,´
+        /*  En esta condicion primero se verifica que sea un string la 
+            la posicion 1 del query ,se creara un arreglo de esa posicion
+            esto separado por una "," .  de ahi se hace condicion para
+            para saber si hay espacio al inicio o al final,
+            si es que hay espacios es que la consulta esta mal ya que no deberia empezar 
+            ni terminar en ";"
+        */
+        else if ( typeof query[1] === 'string') {
+          const arregloQuery1= query[1].split(',');
 
             if (arregloQuery1[0] === "" || arregloQuery1[arregloQuery1.length - 1] === "") {
             console.log("dato incorrecto en la posicion [1]");
           } else{
             queryObtenido.push(1000)}
         }  
+        
        //////////////////////////////////////////////////////////// 
        
        ///////////////tokenizar la posicion 2/////////////////////7
@@ -75,7 +76,12 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         
         
         if (typeof query[3] === 'string') {
-          queryObtenido.push(1000);
+            const arregloQuery3= query[3].split(',');
+
+            if (arregloQuery3[0] === "" || arregloQuery3[arregloQuery3.length - 1] === "") {
+            console.log("dato incorrecto en la posicion [3]");
+          } else{
+            queryObtenido.push(1000)}
         }
          ///////////////////////
       
@@ -93,9 +99,13 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
       ///////tokenizar la posicion 5///////
 
       if (typeof query[5] === 'string') {
-        queryObtenido.push(1000);
-      }
+        const arregloQuery5= query[5].split(',');
 
+            if (arregloQuery5[0] === "" || arregloQuery5[arregloQuery5.length - 1] === "") {
+            console.log("dato incorrecto en la posicion [5]");
+          } else{
+            queryObtenido.push(1000)}
+      }
 
       ////////////////////////////////////
 
@@ -125,18 +135,28 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         /////////////////////////////////////
       
         //////tokenizar posicion 7//////////////////
+        /* 
+            En esta parte se valida que la posicion [7]
+            del query sea un numero
+                */
         
         if(!isNaN(parseInt(query[7]))){
             queryObtenido.push(2000);
            ;} else{
             queryObtenido.push('error');
         }
-  
 
-            
         ///////////////////////////////////////////
-        /////////////tokenizar posicion 8///////////////////
 
+        /////////////tokenizar posicion 8///////////////////
+        /*
+        primero se revisa la posicion[8] del query es un ";"
+        si es asi queryOntenido resibe un 6 .
+        (esto lo hace ya que el query  hasta en esa posicion ya podria otener un ";")
+        si no revisa si es un operadorLogico y push deauerdo el 
+        operador logico
+        
+        */ 
         if(query[8]===";"){
             queryObtenido.push(6)
 
@@ -160,11 +180,24 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
 
         ///////////toquenizar posicion 9///////////////
         if (typeof query[9] === 'string') {
-            queryObtenido.push(1000);
+            const arregloQuery9= query[9].split(',');
+
+            if (arregloQuery9[0] === "" || arregloQuery9[arregloQuery9.length - 1] === "") {
+            console.log("dato incorrecto en la posicion [9]");
+          } else{
+            queryObtenido.push(1000)}
         } 
         ////////////////////////////////////////////
 
         //////////tokenizar posicion 10///////////////////
+
+            /* 
+            En esta parte revisa que el query en la posicion
+            [10] incluye un operadorComparacion
+            si es asi busca cual es el operadorComparacion obtenido y da push con el 
+            token correspondiente
+            
+            */
         
         if (operadoresComparacion.includes(query[10])) {
             if(query[10]=== ">"){
@@ -190,10 +223,17 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
          
         ////////////////////////////////////////////////////////
 
-        ///////////vtokenizar posicion11////////////////////////////
+        ///////////tokenizar posicion11////////////////////////////
+            /*
+            en esta parte primero se  verifica que sea un string la posicion [11]
+            si es asi se crea  otro arreglo  el cual se separara por "'" 
+            esto para verificar que el query este escrito con "'"
+            al principio y al final
+            si es asi push su token correspondiente
+            */
+
         if (typeof query[11] === 'string') {
-            const arregloQuery2= query[11].split("'");// aqui se obtendra otro arreglo para haci hacer las validaciones
-            //aqui valido que el string  empieze con ' y termine con '
+            const arregloQuery2= query[11].split("'");
               if (arregloQuery2[0] === "" && arregloQuery2[arregloQuery2.length - 1] === "") {
               queryObtenido.push(1001)}
               else{
@@ -204,6 +244,16 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         //////////////////////////////////////////////
 
         /////////////tokenizar la posicion 12///////////////
+
+        /*
+        aqui primero revisa que la posicion[12] sea igual a ";"
+        si es asi push su token correspondiente
+         (esto lo hace ya que el query  hasta en esa posicion ya podria otener un ";")
+         si no revisa que sea la palabra "ORDER"
+         si es asi push su token correspondiente
+
+         */
+
         if(query[12]===";"){    
             queryObtenido.push(6);
         }
@@ -217,6 +267,8 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         /////////////////////////////////////////////////////////
 
         //////////// tokenizar la posicion 13/////////////////////
+
+    
         if(query[13] === 'BY'){
            queryObtenido.push(79);
         }
@@ -227,12 +279,24 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
 
         /////////tokenizar la posicion 14/////////////////////////////
          if (typeof query[14] === 'string') {
-            queryObtenido.push(1000);
+            const arregloQuery14= query[14].split(',');
+
+            if (arregloQuery14[0] === "" || arregloQuery14[arregloQuery14.length - 1] === "") {
+            console.log("dato incorrecto en la posicion [14]");
+          } else{
+            queryObtenido.push(1000)}
+
         }
         
         /////////////////////////////////////////////////////////////
         
         /////////////////tokenizar la posicion 15//////////////////////////
+
+        /*
+                aqui se revisa que la si la posicion[15]del query
+                contenga "ASC" o "DESC" de ahi push su token correspondiente
+        
+        */
          if (query[15] === 'ASC' ) {
            queryObtenido.push(119)
         } 
@@ -245,6 +309,15 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         /////////////////////////////////////////////////////////////////////
         
         ////////////tokenizar posicion 16////////////////////////////
+
+            /*
+            aqui revisa si el query en la posicion [16]
+            es un ";" si es asi push su token correspondiente
+            , (esto lo hace ya que el query  hasta en esa posicion ya podria otener un ";") 
+            de lo contrario revisa si la palabra es "LIMIT"
+            si es asi devuelve su token corespondinte
+            
+            */
         if(query[16]===";"){
             queryObtenido.push(6);
 
@@ -258,6 +331,11 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         ////////////////////////////////////////////////////
 
         //////////////////tokenizar posicion 17//////////////////
+
+            /*
+                aqui se revisa si query en la posicion[17] es un numero
+                para asi devolver su token correspondiente
+            */
         if (!isNaN(parseInt(query[17]))) {
             queryObtenido.push(2000);
         }
@@ -267,6 +345,11 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         //////////////////////////////////////////////////////////////////////
 
         ///////////////tokenizar posicion 18///////////////////////////////
+        /* 
+        aqui revisa si el query en la posicion [18]
+            es un ";" si es asi push su token correspondiente
+           
+        */
         if( query[18] === ';'){
            queryObtenido.push(6);
         }
@@ -274,40 +357,53 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
             queryObtenido.push('error');
         }
         /////////////////////////////////
-        console.log("tokenizar elementos del arreglo: ", queryObtenido);
+        console.log(" este es el arreglo obtenido  de tokenizar el query obtenido de dataBase.txt :","\n", JSON.stringify(queryObtenido));
 
        
     
-    }  /////////VALIDACIONES/////////  
-    const buscarCierre =queryObtenido.indexOf(6);//con esto busco  ";" del query
-    const querytamañofinal= [];//en este query se guardara el arreglo final para hacer validaciones
+    }  /////////VALIDACIONES///////////////////////////////////////////  
 
-    for(let i=0; i <= buscarCierre;i++){
+ ////////////////////////////////////////////////////
+        /*
+            Despues  De haber obtenido nuestro nuevo arreglo ya tokenizado
+            se busca donde hay un [6] que es el token referente al ";"
+            con esto para crear otro arreglo con la longitud de acuerdo a donde el query termina 
+            con ";"
+
+        */ 
+      const querytamañofinal =[];
+
+    const indiceBuscarCierre =queryObtenido.indexOf(6);
+
+    for(let i=0; i <= indiceBuscarCierre;i++){
         querytamañofinal.push(queryObtenido[i]);
     }
+/////////////////////////////////////////////////////
 
-//aqui se escriben  los querys que son validos
+////////// EN Esta parte se escribiran todos los arreglos que pueden ser validos por SQL////////
+
 const queryValido1 =[655,1000,309,1000,800,1000,10,2000,115,1000,10,1001,528,79,1000,231,407,2000,6];
 const queryValido2= [655,1000,309,1000,6];
-///////////////////////////////////////////////////////////////
-console.log("Este es el arreglo final: ", querytamañofinal);
 
+////////////////////////////////////////////////////////////////////////////////////////////
+console.log("\n","Este es el arreglo final el cual sera validado con con las validaciones: ","\n", JSON.stringify(querytamañofinal));
+        /*
+        se conviete querytamañofinal y  el queryvalido a evaluar en un string 
+        para luego hacer una comparacion para determinar si es correcto
+        
+        */ 
  if(querytamañofinal.join(" ") === queryValido1.join(" "))
  {
-    console.log("el query es valido");
+    console.log("\n","el query es valido");
  }else if(querytamañofinal.join(" ") === queryValido2.join(" ")){
-    console.log("el query es valido");
+    console.log("\n","el query es valido");
  }
  else{
-    console.log("el query no es valido")
+    console.log("\n","el query no es valido")
  }
 
 
     /////////////////////////////////////////////////////////////////
-
- 
-    console.log(querytamañofinal);
-  
 
 /////////////////////////////////////
      // Crear y escribir en el archivo de registro
