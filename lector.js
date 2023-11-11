@@ -97,11 +97,11 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
           if (indice===0){
             indice++;
           }else{
-            console.log("consulta incorrecta la palabra select no se encuentra en la posicion correcta");
-            renglonesIncorrectos.push("consulta incorrecta la palabra select no se encuentra en la posicion correcta")
+            console.log(" Error ,consulta incorrecta la palabra SELECT no se encontro");
+            renglonesIncorrectos.push("Error, consulta incorrecta la palabra SELECT no se encontro");
           }
           /*
-            Aqui esta serie de if anidados se llevara a cabo
+            Aqui esta serie de if anidados se llevara a cabo                                                                                                                               
             si en la posicion que estamos el valor es 7
             esto es para validar
             select * FROM tabla;
@@ -119,23 +119,23 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
                     if(arregloFinalTOkenizado[indice]===6){
                         console.log(" la consulta es correcta: ","\n",query.join(" "));
                     }else{
-                      console.log(" no se termino la consulta con ';'");
-                      renglonesIncorrectos.push(" no se termino la consulta con ';'")
+                      console.log(" Error ,no se termino la consulta con ';'");
+                      renglonesIncorrectos.push(" Error, no se termino la consulta con ';'")
                     }
                 }else{
                 console.log("ERROR no se puede utilizar una palabra reservada despues de FROM");
                 renglonesIncorrectos.push("ERROR no se puede utilizar una palabra reservada despues de FROM")
               }
             }else{
-              console.log("se esperaba FROM en la posicion",[indice]);
-              renglonesIncorrectos.log("se esperaba FROM en la posicion",[indice]);
+              console.log("Error,se esperaba FROM en la posicion",[indice]);
+              renglonesIncorrectos.log("Error se esperaba FROM en la posicion",[indice]);
             }
             /////////validar si se trabajara sin "*"
           }else if (arregloFinalTOkenizado[indice] === 1000) {
-            indice++;}
-            else{
-              console.log("se esperaba un '*' o 'una palabra no reservda");
-              renglonesIncorrectos.push("se esperaba un '*' o 'una palabra no reservada");
+            indice++;
+          }else{
+              console.log("Error se esperaba un '*' o 'una palabra no reservada");
+              renglonesIncorrectos.push("Error se esperaba un '*' o 'una palabra no reservada");
             }
         
               /*
@@ -162,10 +162,11 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
             var contieneFrom = true;
 
          if(!arregloFinalTOkenizado.includes(309)){
-          console.log("no se encontro FROM");
-          renglonesIncorrectos.push("no se encontro FROM");
+          console.log("Error no se encontro FROM");
+          renglonesIncorrectos.push("Error no se encontro FROM");
           contieneFrom=false;
          }
+         
            if(contieneFrom){
            indice++;
            /*
@@ -173,19 +174,19 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
            posicion por el FROM habia un ','
            esto porque no se puede haber un ',' antes que el FROM
            */
-            if(arregloFinalTOkenizado[indice-2]==3){
-              console.log("la consulta es incorrecta ya que no debe ir  una ',' antes del FROM ");
-              renglonesIncorrectos.push("la consulta es incorrecta ya que no debe ir  una ',' antes del FROM ");
+            if(arregloFinalTOkenizado[indice-2]==3&&arregloFinalTOkenizado[indice-2==655]){
+              console.log("Error la consulta es incorrecta ya que no debe ir  una 'palabra reservada' antes del FROM ");
+              renglonesIncorrectos.push("Error la consulta es incorrecta ya que no debe ir  una 'palabra reservada' antes del FROM ");
             }
-      if(arregloFinalTOkenizado[indice-2]!==3){
+      if(arregloFinalTOkenizado[indice-2]!==3&&arregloFinalTOkenizado[indice-2]!==655){
          if(trabajarConAsterisco){ 
           if (arregloFinalTOkenizado[indice] === 1000 ){
                   indice++;
                   if (arregloFinalTOkenizado[indice] === 6) {
                     console.log("Consulta correcta:","\n", query.join(" "),"\n");
                   }else{
-                    console.log("consulta no terminada con ';'");
-                    renglonesIncorrectos.push("consulta no terminada con ';'");
+                    console.log("Error consulta no terminada con ';'");
+                    renglonesIncorrectos.push("Error consulta no terminada con ';'");
                   }
                 }else{
                   console.log("error no se puede trabajar con una palabra reservada despues de FROM");

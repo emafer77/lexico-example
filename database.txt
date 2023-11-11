@@ -1,1 +1,1 @@
-SELECT * FROM personas ;
+SELECT nombre FROM personas ;
