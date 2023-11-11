@@ -26,7 +26,7 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
 
      var cadena_split = data.split('\n').map(linea => linea.replace('\r',''));//Aqui se forma un arreglo con cada renglon de database.txt
 
-    console.log("aqui se muestra las o la consultas a ejecutar:","\n",JSON.stringify(cadena_split), "\n");
+    console.log("aqui se muestra las o la consultas a ejecutar:","\n",JSON.stringify(cadena_split),"\n","-----------------------------------------");
     
 
 
@@ -67,8 +67,8 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         for(let j =0;j<query.length;j++){
             buscarPalabraEnObjeto(query[j],specialCharacters);   
         }
-    
-        console.log("\n","este es el arreglo tokenizado:",JSON.stringify(arregloFinalTOkenizado));
+        
+        console.log("--------------------------------------","\n","este es el arreglo tokenizado:",JSON.stringify(arregloFinalTOkenizado),"\n","-----------------------------");
     /////////VALIDACIONES///////////////////////////////////////////  
   
         //////////////////////////////////////////////////////
@@ -107,6 +107,7 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
 
           */
          var trabajarConAsterisco=true;//esta variable definira el camino a seguir
+         if(indice===1){ //ESTO SE LLEVARA ACABO SI SE ENCONTRO SELECT POSTERIOR MENTE
           if(arregloFinalTOkenizado[indice]===7){
             trabajarConAsterisco=false;
             indice++;
@@ -115,17 +116,18 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
                 if(arregloFinalTOkenizado[indice]===1000){
                     indice++;
                     if(arregloFinalTOkenizado[indice]===6){
-                        console.log(" la consulta es correcta: ",query.join(" "));
+                        console.log(" la consulta es correcta: ","\n",query.join(" "));
                     }else{
                       console.log(" no se termino la consulta con ';'");
                     }
                 }else{
-                console.log("no se puede una palabra reservada despues de FROM");}
+                console.log("ERROR no se puede utilizar una palabra reservada despues de FROM");}
             }else{console.log("se esperaba FROM en la posicion",[indice])}
             /////////validar si se trabajara sin "*"
           }else if (arregloFinalTOkenizado[indice] === 1000) {
             indice++;}
-            else(console.log("se esperaba un '*' o 'una palabra no reservda"))
+            else{console.log("se esperaba un '*' o 'una palabra no reservda")}
+        
               /*
                  en este while se terminara cuando encuentre un 309 
                  es decir cuando encuentre un FROM
@@ -164,16 +166,23 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
               console.log("la consulta es incorrecta ya que no debe ir  una ',' antes del FROM ");
             }
       if(arregloFinalTOkenizado[indice-2]!==3){
-         if(trabajarConAsterisco){ if (arregloFinalTOkenizado[indice] === 1000 ){
-                  indice++;}
+         if(trabajarConAsterisco){ 
+          if (arregloFinalTOkenizado[indice] === 1000 ){
+                  indice++;
                   if (arregloFinalTOkenizado[indice] === 6) {
-                    console.log("Consulta correcta:", query.join(" "));
+                    console.log("Consulta correcta:","\n", query.join(" "),"\n");
                   }else{
                     console.log("consulta no terminada con ';'");
                   }
+                }else{
+                  console.log("error no se puede trabajar con una palabra reservada despues de FROM")
+                }
          }
-      }}
-
+      }
+           }
+         }else{
+          console.log("--------------------------------------");
+         }
           
 //////////////////
 
