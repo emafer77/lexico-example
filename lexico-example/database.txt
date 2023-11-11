@@ -1,1 +1,0 @@
-SELECT nombre FROM personas WHERE edad >= 25 AND ciudad = 'ensenada' ORDER BY edad DESC LIMIT 10 ;
