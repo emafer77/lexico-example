@@ -97,7 +97,8 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
           if (indice===0){
             indice++;
           }else{
-            console.log("consulta incorrecta la palabra select no se encuentra en la posicion correcta")
+            console.log("consulta incorrecta la palabra select no se encuentra en la posicion correcta");
+            renglonesIncorrectos.push("consulta incorrecta la palabra select no se encuentra en la posicion correcta")
           }
           /*
             Aqui esta serie de if anidados se llevara a cabo
@@ -119,14 +120,23 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
                         console.log(" la consulta es correcta: ","\n",query.join(" "));
                     }else{
                       console.log(" no se termino la consulta con ';'");
+                      renglonesIncorrectos.push(" no se termino la consulta con ';'")
                     }
                 }else{
-                console.log("ERROR no se puede utilizar una palabra reservada despues de FROM");}
-            }else{console.log("se esperaba FROM en la posicion",[indice])}
+                console.log("ERROR no se puede utilizar una palabra reservada despues de FROM");
+                renglonesIncorrectos.push("ERROR no se puede utilizar una palabra reservada despues de FROM")
+              }
+            }else{
+              console.log("se esperaba FROM en la posicion",[indice]);
+              renglonesIncorrectos.log("se esperaba FROM en la posicion",[indice]);
+            }
             /////////validar si se trabajara sin "*"
           }else if (arregloFinalTOkenizado[indice] === 1000) {
             indice++;}
-            else{console.log("se esperaba un '*' o 'una palabra no reservda")}
+            else{
+              console.log("se esperaba un '*' o 'una palabra no reservda");
+              renglonesIncorrectos.push("se esperaba un '*' o 'una palabra no reservada");
+            }
         
               /*
                  en este while se terminara cuando encuentre un 309 
@@ -153,6 +163,7 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
 
          if(!arregloFinalTOkenizado.includes(309)){
           console.log("no se encontro FROM");
+          renglonesIncorrectos.push("no se encontro FROM");
           contieneFrom=false;
          }
            if(contieneFrom){
@@ -164,6 +175,7 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
            */
             if(arregloFinalTOkenizado[indice-2]==3){
               console.log("la consulta es incorrecta ya que no debe ir  una ',' antes del FROM ");
+              renglonesIncorrectos.push("la consulta es incorrecta ya que no debe ir  una ',' antes del FROM ");
             }
       if(arregloFinalTOkenizado[indice-2]!==3){
          if(trabajarConAsterisco){ 
@@ -173,9 +185,11 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
                     console.log("Consulta correcta:","\n", query.join(" "),"\n");
                   }else{
                     console.log("consulta no terminada con ';'");
+                    renglonesIncorrectos.push("consulta no terminada con ';'");
                   }
                 }else{
-                  console.log("error no se puede trabajar con una palabra reservada despues de FROM")
+                  console.log("error no se puede trabajar con una palabra reservada despues de FROM");
+                  renglonesIncorrectos.push("error no se puede trabajar con una palabra reservada despues de FROM");
                 }
          }
       }
@@ -191,13 +205,13 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
 
 /////////////////////////////////////
      // Crear y escribir en el archivo de registro
-     //const logData = renglonesIncorrectos.join('\n');
-     //fs.writeFile('log.txt', logData, (err) => {
-        // if (err) {
-        //     console.error("\n"+"Error al escribir en el archivo de registro:", err);
-      //   } else {
-    //         console.log("\n"+"Archivo de registro ('log.txt') creado con los renglones incorrectos.");
-  //       }
-//});   
+     const logData = renglonesIncorrectos.join('\n');
+     fs.writeFile('log.txt', logData, (err) => {
+         if (err) {
+             console.error("\n"+"Error al escribir en el archivo de registro:", err);
+         } else {
+             console.log("---------------------------------","\n","Archivo de registro ('log.txt') creado con los renglones incorrectos.");
+         }
+});   
 
 });
