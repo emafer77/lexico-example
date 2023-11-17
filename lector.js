@@ -2,17 +2,18 @@
 const { Console } = require('console');
 const fs = require('fs');
 const { specialCharacters } = require('./sqlkeywords');
-const arregloFinalTOkenizado =[];
+
 
 fs.readFile('database.txt', 'utf8', (err, data) => {
     if (err) {
         console.error(err);
         return;
     }
-  
+ 
   /*esta funcion es la encargada de tokenizar todas mis palabras */
 
     function buscarPalabraEnObjeto(palabra, objeto) {
+     
         if (objeto.hasOwnProperty(palabra)) {
             console.log(`el numero correspondiente a la palabra "${palabra}" es: ${objeto[palabra]}`);
             arregloFinalTOkenizado.push(objeto[palabra]);
@@ -33,9 +34,10 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         const renglonesIncorrectos = [];
 
         for (let i = 0; i < cadena_split.length; i++) {
-            var query = cadena_split[i].split(" ");//aqui se crea un arreglo con los datos de cada renglon en database.txt
-         } 
-           /*aqui se separa la posicion[1]del query
+          var arregloFinalTOkenizado =[];
+          var query = cadena_split[i].split(" ");//aqui se crea un arreglo con los datos de cada renglon en database.txt
+        
+           /*aqui se separa la posicion[1]del qssuery
            convirtiendolo es un arreglo */
         const separarArrego= query[1].split(/(,)/);//con esto se agrega la "," tambien
         /*
@@ -94,6 +96,7 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
           se evalua si indice es 0 para saber si la
           primera parabra es select
          */
+        
           if (indice===0){
             indice++;
           }else{
@@ -107,8 +110,9 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
             select * FROM tabla;
 
           */
+       
          var trabajarConAsterisco=true;//esta variable definira el camino a seguir
-         if(indice===1){ //ESTO SE LLEVARA ACABO SI SE ENCONTRO SELECT POSTERIOR MENTE
+         if(indice===1 && arregloFinalTOkenizado[indice]!==3){ //ESTO SE LLEVARA ACABO SI SE ENCONTRO SELECT POSTERIOR MENTE y la pocicion 1 no es una ,
           if(arregloFinalTOkenizado[indice]===7){
             trabajarConAsterisco=false;
             indice++;
@@ -174,8 +178,9 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
            posicion por el FROM habia un ','
            esto porque no se puede haber un ',' antes que el FROM
            */
-            if(arregloFinalTOkenizado[indice-2]==3&&arregloFinalTOkenizado[indice-2==655]){
-              console.log("Error la consulta es incorrecta ya que no debe ir  una 'palabra reservada' antes del FROM ");
+      
+            if(arregloFinalTOkenizado[indice-2]==3 || arregloFinalTOkenizado[indice-2==655]){
+              console.log("Error la consulta es incorrecta ya que no debe un 'SELECT' o una ',' antes del FROM ");
               renglonesIncorrectos.push("Error la consulta es incorrecta ya que no debe ir  una 'palabra reservada' antes del FROM ");
             }
       if(arregloFinalTOkenizado[indice-2]!==3&&arregloFinalTOkenizado[indice-2]!==655){
@@ -196,11 +201,11 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
       }
            }
          }else{
-          console.log("--------------------------------------");
+          console.log("error se escribio una ',' antes de '*' o 'palabra no reservada' ");
          }
-          
+         console.log(indice);
+        }
 //////////////////
-
 
     /////////////////////////////////////////////////////////////////
 

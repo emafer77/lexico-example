@@ -1,1 +1,3 @@
 SELECT nombre FROM personas ;
+SELECT edad FROM personas ;
+SELECT direccion, FROM personas ;
