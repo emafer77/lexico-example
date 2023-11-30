@@ -2,7 +2,7 @@
 const { Console } = require('console');
 const fs = require('fs');
 const { specialCharacters } = require('./sqlkeywords');
-
+const { validarWhere } =require('./validaciones');
 
 fs.readFile('database.txt', 'utf8', (err, data) => {
     if (err) {
@@ -10,36 +10,70 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         return;
     }
  
+    
   /*esta funcion es la encargada de tokenizar todas mis palabras */
 
-    function buscarPalabraEnObjeto(palabra, objeto) {
-     
-        if (objeto.hasOwnProperty(palabra)) {
-            console.log(`el numero correspondiente a la palabra "${palabra}" es: ${objeto[palabra]}`);
-            arregloFinalTOkenizado.push(objeto[palabra]);
-        } else {
-            arregloFinalTOkenizado.push(1000);
-          console.log(`La palabra "${palabra}" la palabra no esta reservado por lo tanto se tokenizo con  el valor = 1000.`);
-        }
+  function buscarPalabraEnObjeto(palabra, objeto) {
+    if (objeto.hasOwnProperty(palabra)) {
+        console.log(`El número correspondiente a la palabra "${palabra}" es: ${objeto[palabra]}`);
+        arregloFinalTOkenizado.push(objeto[palabra]);
+    } else if (!isNaN(palabra)) {
+        arregloFinalTOkenizado.push(2000);
+    } else if (palabra.startsWith("'")||palabra.endsWith("'")) {//aqui se verifica si la palabra empieza con "'"
+        arregloFinalTOkenizado.push(1001);
+    } else {
+        arregloFinalTOkenizado.push(1000);
+        console.log(`La palabra "${palabra}" no está reservada; por lo tanto, se tokeniza con el valor 1000.`);
+    }
+}
+
+
+///////////////////////////////////////////////
+
+/**
+ esta funcion verifica el arreglo tokenizado
+ busca si hay un valor 1001 en este arreglo
+ si hay un 1001 dentro del arreglo devuelve la
+ posicion en donde encontro esa palabra
+ despues busca en query segun la posicion indicada
+ si dicha palabra termina con "'"
+ si termina devuelve un false
+ si no termina devulve un true.
+ */
+function buscarPosicionYVerificar(arrNumeros, arrPalabras) {
+  // Buscar la posición del número 1001 en el primer arreglo
+  const posicion = arrNumeros.indexOf(1001);
+  let NoTerminaConSimples ='';
+  if (posicion !== -1) {
+      // Verificar si la palabra en la misma posición en el segundo arreglo termina con comillas simples
+      const palabra = arrPalabras[posicion];
+
+      if (palabra.endsWith("'") && palabra.startsWith("'")) {
+          NoTerminaConSimples = false;
+      } else {
+         NoTerminaConSimples =true;
       }
+  } 
+return NoTerminaConSimples;
+}
 
 
-
+/////////////////////////////////////////////
      var cadena_split = data.split('\n').map(linea => linea.replace('\r',''));//Aqui se forma un arreglo con cada renglon de database.txt
 
     console.log("aqui se muestra las o la consultas a ejecutar:","\n",JSON.stringify(cadena_split),"\n","-----------------------------------------");
-    
-
-
+  
         const renglonesIncorrectos = [];
 
         for (let i = 0; i < cadena_split.length; i++) {
           var arregloFinalTOkenizado =[];
           var query = cadena_split[i].split(" ");//aqui se crea un arreglo con los datos de cada renglon en database.txt
+     
         
            /*aqui se separa la posicion[1]del qssuery
            convirtiendolo es un arreglo */
         const separarArrego= query[1].split(/(,)/);//con esto se agrega la "," tambien
+        
         /*
           aqui se filtra el separarArreglo para que no creara espacios vacios
           ya que con "," al final o al principio  en la posicion[1] crea espacios
@@ -70,8 +104,15 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
             buscarPalabraEnObjeto(query[j],specialCharacters);   
         }
         
+      
         console.log("--------------------------------------","\n","este es el arreglo tokenizado:",JSON.stringify(arregloFinalTOkenizado),"\n","-----------------------------");
-    /////////VALIDACIONES///////////////////////////////////////////  
+        
+        //con est funcion se buscara si tenemos palabras no reservadas con comillas simples"'"
+        const notermina =buscarPosicionYVerificar(arregloFinalTOkenizado, query);
+    
+    
+    
+        /////////VALIDACIONES///////////////////////////////////////////  
   
         //////////////////////////////////////////////////////
         /*
@@ -122,6 +163,8 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
                     indice++;
                     if(arregloFinalTOkenizado[indice]===6){
                         console.log(" la consulta es correcta: ","\n",query.join(" "));
+                    }else if(arregloFinalTOkenizado[indice]===800){
+                      validarWhere(indice,arregloFinalTOkenizado,notermina,query);
                     }else{
                       console.log(" Error ,no se termino la consulta con ';'");
                       renglonesIncorrectos.push(" Error, no se termino la consulta con ';'")
@@ -189,7 +232,12 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
                   indice++;
                   if (arregloFinalTOkenizado[indice] === 6) {
                     console.log("Consulta correcta:","\n", query.join(" "),"\n");
-                  }else{
+                  }else if(arregloFinalTOkenizado[indice]=== 800){
+                    validarWhere(indice,arregloFinalTOkenizado,notermina,query);
+                  }else if(arregloFinalTOkenizado[indice]===407){
+                    
+                  }
+                  else{
                     console.log("Error consulta no terminada con ';'");
                     renglonesIncorrectos.push("Error consulta no terminada con ';'");
                   }
@@ -203,7 +251,7 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
          }else{
           console.log("error se escribio una ',' antes de '*' o 'palabra no reservada' ");
          }
-         console.log(indice);
+        
         }
 //////////////////
 
