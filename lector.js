@@ -3,7 +3,7 @@ const { Console } = require('console');
 const fs = require('fs');
 const { specialCharacters } = require('./sqlkeywords');
 const { validarWhere } =require('./validaciones');
-
+const arregloTokentxt =[];
 fs.readFile('database.txt', 'utf8', (err, data) => {
     if (err) {
         console.error(err);
@@ -25,8 +25,10 @@ fs.readFile('database.txt', 'utf8', (err, data) => {
         arregloFinalTOkenizado.push(1000);
         console.log(`La palabra "${palabra}" no está reservada; por lo tanto, se tokeniza con el valor 1000.`);
     }
+ 
 }
 
+  
 
 ///////////////////////////////////////////////
 
@@ -252,10 +254,11 @@ return NoTerminaConSimples;
           console.log("error se escribio una ',' antes de '*' o 'palabra no reservada' ");
          }
         
+      
+         arregloTokentxt.push(arregloFinalTOkenizado);
         }
 //////////////////
-
-    /////////////////////////////////////////////////////////////////
+///////////////
 
 /////////////////////////////////////
      // Crear y escribir en el archivo de registro
@@ -264,8 +267,19 @@ return NoTerminaConSimples;
          if (err) {
              console.error("\n"+"Error al escribir en el archivo de registro:", err);
          } else {
-             console.log("---------------------------------","\n","Archivo de registro ('log.txt') creado con los renglones incorrectos.");
+             console.log("---------------------------------","\n","Archivo de registro ('log.txt') ha sido creado");
          }
-});   
+  }); 
+
+  const tokenArchivo = arregloTokentxt.map(tokens => tokens.join(',')).join('\n');
+fs.writeFile('tokens.txt', tokenArchivo, (err) => {
+    if (err) {
+        console.error("\n"+"Error al escribir en el archivo de registro:", err);
+    } else {
+        console.log("---------------------------------","\n","Archivo de registro ('tokens') ha sido creado.");
+    }
+});
+  
+
 
 });

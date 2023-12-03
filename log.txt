@@ -1,0 +1,1 @@
+Error la consulta es incorrecta ya que no debe ir  una 'palabra reservada' antes del FROM 
